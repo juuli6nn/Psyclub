@@ -3,6 +3,12 @@
 .env
 .env.backup
 .env.production
+.claude/
+.cursor/
+.kiro/
+.mcp.json
+AGENTS.md
+HANDOFF.md
 .phpactor.json
 .phpunit.result.cache
 /.fleet
