@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\BrevoMailService;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -59,5 +60,10 @@ class User extends Authenticatable implements MustVerifyEmail
             'profile_completed_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function sendEmailVerificationNotification(): void
+    {
+        app(BrevoMailService::class)->sendVerificationEmail($this);
     }
 }

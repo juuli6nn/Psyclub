@@ -57,6 +57,8 @@ services:
         sync: false
       - key: MAIL_FROM_NAME
         value: PsyClub
+      - key: BREVO_API_KEY
+        sync: false
       - key: OPENWEATHER_KEY
         sync: false
       - key: GOOGLE_MAPS_KEY

@@ -68,8 +68,10 @@ class AuthController extends Controller
         try {
             event(new Registered($user));
         } catch (\Throwable $e) {
+            report($e);
+
             return redirect()->route('verification.notice')->withErrors([
-                'email' => 'Account created, but verification email could not be sent: '.$e->getMessage(),
+                'email' => 'Account created, but the verification email could not be sent. Please try again later.',
             ]);
         }
 
@@ -110,8 +112,10 @@ class AuthController extends Controller
         try {
             $request->user()->sendEmailVerificationNotification();
         } catch (\Throwable $e) {
+            report($e);
+
             return back()->withErrors([
-                'email' => 'Could not send verification email: '.$e->getMessage(),
+                'email' => 'Could not send the verification email. Please try again later.',
             ]);
         }
 

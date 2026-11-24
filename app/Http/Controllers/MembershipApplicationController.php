@@ -8,15 +8,16 @@ use App\Models\MembershipApplication;
 use App\Models\MembershipCategory;
 use App\Models\MembershipLevel;
 use App\Models\MembershipTransaction;
-use App\Notifications\MembershipApplicationSubmitted;
+use App\Services\BrevoMailService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class MembershipApplicationController extends Controller
 {
+    public function __construct(private readonly BrevoMailService $brevoMailService) {}
+
     public function create(): View
     {
         return view('membership.create', [
@@ -71,8 +72,7 @@ class MembershipApplicationController extends Controller
                 'notes' => 'Submitted via Membership Application Portal ('.$referenceNo.').',
             ]);
 
-            Notification::route('mail', $application->email)
-                ->notify(new MembershipApplicationSubmitted($application));
+            $this->brevoMailService->sendMembershipApplicationEmail($application);
 
             $application->update(['verification_sent_at' => now()]);
 

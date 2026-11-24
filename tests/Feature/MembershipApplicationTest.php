@@ -3,9 +3,9 @@
 namespace Tests\Feature;
 
 use App\Models\MembershipCategory;
-use App\Notifications\MembershipApplicationSubmitted;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Notification;
+use Illuminate\Http\Client\Request;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class MembershipApplicationTest extends TestCase
@@ -14,7 +14,14 @@ class MembershipApplicationTest extends TestCase
 
     public function test_application_is_stored_and_email_notification_is_sent(): void
     {
-        Notification::fake();
+        Http::fake([
+            'https://api.brevo.com/*' => Http::response(['messageId' => 'test-message'], 201),
+        ]);
+        config([
+            'services.brevo.api_key' => 'test-brevo-api-key',
+            'mail.from.address' => 'no-reply@example.test',
+            'mail.from.name' => 'PsyClub',
+        ]);
         $category = MembershipCategory::create(['name' => 'Regular', 'fee' => 500]);
 
         $response = $this->post(route('membership.store'), [
@@ -30,6 +37,10 @@ class MembershipApplicationTest extends TestCase
             'email' => 'ana@example.test',
             'status' => 'pending',
         ]);
-        Notification::assertSentOnDemand(MembershipApplicationSubmitted::class);
+        Http::assertSent(function (Request $request): bool {
+            return $request->url() === 'https://api.brevo.com/v3/smtp/email'
+                && $request->header('api-key') === ['test-brevo-api-key']
+                && data_get($request->data(), 'to.0.email') === 'ana@example.test';
+        });
     }
 }
