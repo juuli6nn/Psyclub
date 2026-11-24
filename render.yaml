@@ -16,7 +16,7 @@ services:
       - key: APP_KEY
         sync: false
       - key: APP_URL
-        sync: false
+        value: https://psyclub.onrender.com
       - key: ASSET_URL
         sync: false
       - key: LOG_CHANNEL
